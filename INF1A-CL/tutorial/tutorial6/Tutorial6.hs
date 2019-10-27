@@ -82,7 +82,7 @@ formalEachCityHasColour =
   And [ Or [ P (Paint city colour) | colour <- colours ] | city <- cities ]
 
 formalAdjacentCitiesNotSameColour :: Form Paint
-formalAdjacentCitiesNotSameColour = undefined
+formalAdjacentCitiesNotSameColour = And [ Or [N (Paint cityA colour), N (Paint cityB colour)] | cityA <- cities, cityB <- cities, adj cityA cityB, colour <- colours]
 
 ----------------------------
 (<<) :: Eq a => [Clause a] -> Literal a -> [Clause a] 
@@ -99,6 +99,8 @@ simple (And cs) =
           [ neg x : m | m <- search $ cs << neg x]
   in
    search (canonical cs)
+
+colourings = simple (formalEachCityHasColour <&&> formalAdjacentCitiesNotSameColour)
 
 ------------------------------ latin squares -------------------------
 
@@ -119,15 +121,15 @@ latin n =
       columns = [0..n-1]
       digits  = [1..n]
       everyRowHasEveryDigit =
-        And[ Or[ P (r,c,d) | c <- columns ]
-             | r <- rows, d <- digits]
-      everyColumnHasEveryDigit = undefined
+        And[ Or[ P (r,c,d) | c <- columns ] | r <- rows, d <- digits]
+      everyColumnHasEveryDigit = 
+        And[ Or[ P (r,c,d) | r <- rows ] | c <- columns, d <- digits]
       noSquareHasTwoDigits =
-        And[ Or[ N (r, c, d), N (r, c, d') ]
-           | r <- rows, c <- columns,
-             d <- digits, d' <- digits, d < d']
-      noRowHasARepeatedDigit = undefined
-      noColumnHasARepeatedDigit = undefined
+        And[ Or[ N (r, c, d), N (r, c, d') ] | r <- rows, c <- columns, d <- digits, d' <- digits, d < d']
+      noRowHasARepeatedDigit = 
+        And[ Or[ N (r, c, d), N (r, c', d) ] | r <- rows, c <- columns, c' <- columns, d <- digits, c < c' ]
+      noColumnHasARepeatedDigit = 
+        And[ Or[ N (r, c, d), N (r', c, d) ] | r <- rows, r' <- rows, c <- columns, d <- digits, r < r' ]
   in everyRowHasEveryDigit    
      <&&>everyColumnHasEveryDigit 
      <&&>noSquareHasTwoDigits     
@@ -140,14 +142,14 @@ dpll (And cs) =
   let models cs = case prioritise cs of
         []            -> [[]]     -- no clauses; trivial solution
         Or []  : _    -> []       -- empty clause; no models
-  --      Or [x] : _    -> undefined -- unit clause
+        Or [x] : _    -> [ x : m | m <- models $ cs << x ] -- unit clause
         Or (x : _) : _  ->
           [     x : m | m <- models $ cs << x   ]
           ++
           [ neg x : m | m <- models $ cs << neg x]
   in
    models (canonical cs)
-  where prioritise = id
+  where prioritise cs = sortOn (\(Or lits) -> length lits) cs
 
 -- this is for you to play with faster versions
 speedy :: Eq a => Form a -> [[Literal a]]
@@ -187,7 +189,7 @@ sudoku =
   And [ Or [P (3*p+q, 3*r+s, k) | q <- [1..3], s <- [1..3] ]
       | p <- [0..2], r <- [0..2], k<- [1..9] ]
   <&&> -- no square is filled twice
-  And [ Or[ N (i, j, k), N (i, j, k') ]
+  And [ Or [N (i, j, k), N (i, j, k') ]
       | i <- [1..9], j <- [1..9], k <- [1..9], k' <- [1..(k-1)]]
   <&&> -- no row has repeated digit
   And [ Or [N (i, j, k), N (i, j', k) ]
@@ -196,7 +198,7 @@ sudoku =
   And [ Or [N (i, j, k), N (i', j, k) ]
       | j <- [1..9], k<- [1..9], i <- [1..9], i' <- [1..(i-1)] ]
   <&&> -- no bigsquare has repeated digit
-  And [ Or [N(3*p+q, 3*r+s, k), N (3*p+q', 3*r+s', k) ]
+  And [ Or [N (3*p+q, 3*r+s, k), N (3*p+q', 3*r+s', k) ]
       | p <- [0..2], r <- [0..2], k<- [1..9]
       , q <- [1..3], s <- [1..3], q' <- [1..q], s' <- [1..3]
       , q' < q || s' < s]
