@@ -99,13 +99,23 @@ hilbert x = undefined
 
 -- Bonus L-Systems
 
-peanoGosper = undefined
+peanoGosper x = f x where
+    f 0 = Go 10
+    f x = f(x-1) :#: p :#: g(x-1) :#: p :#: p :#: g(x-1) :#: n :#: f(x-1) :#: n :#: n :#: f(x-1) :#: f(x-1) :#: n :#: g(x-1) :#: p 
+    g 0 = Go 10
+    g x = n :#: f(x-1) :#: p :#: g(x-1) :#: g(x-1) :#: p :#: p :#: g(x-1) :#: p :#: f(x-1) :#: n :#: n :#: f(x-1) :#: n :#: g(x-1) 
+    n   = Turn 60
+    p   = Turn (-60)
 
 
-cross = undefined
+cross x = f x :#: n :#: f x :#: n :#: f x :#: n :#: f x :#: n where
+    f 0 = Go 10
+    f x = f(x-1) :#: n :#: f(x-1) :#: p :#: f(x-1) :#: p :#: f(x-1) :#: f(x-1) :#: n :#: f(x-1) :#: n :#: f(x-1) :#: p :#: f(x-1)
+    n   = Turn 90
+    p   = Turn (-90)
 
 
-branch = undefined
+branch x = undefined
 
 thirtytwo = undefined
 
