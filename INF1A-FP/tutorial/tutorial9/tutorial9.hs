@@ -195,15 +195,25 @@ prop_stringFSM m n =
 
 completeFSM :: (Ord q) => FSM q -> FSM (Maybe q)
 completeFSM m = (ks, as, ss, fs, ts) where
+  isMissing s sym = length [ q' | t@(q,symbol,q') <- trans m, symbol == sym, q == s ] == 0
   ks = Nothing : map Just (states m)
   as = alph m
   ss = map Just (start m)
   fs = map Just (final m)
-  ts = undefined
+  ts = [ (Just s,sym,Nothing) | s <- states m, sym <- alph m, isMissing s sym ] 
+       ++ map (\(q,sym,q') -> (Just q,sym,Just q')) (trans m)
+  
   
 
 unionFSM :: (Ord q, Ord q') => FSM q -> FSM q' -> FSM (Maybe q, Maybe q')
-unionFSM = undefined
+unionFSM a b = (ks, as, ss, fs, ts) where
+  a' = completeFSM a
+  b' = completeFSM b
+  ks = [(x,y) | x <- states a', y <- states b']
+  as = nub (alph a' ++ alph b')
+  ss = [(x,y) | x <- start a', y <- start b']
+  fs = [(x,y) | x <- final a', y <- final b']
+  ts = [((x1,y1),symx,(x2,y2))| (x1,symx,x2) <- trans a', (y1,symy,y2) <- trans b', symx == symy]
         
 prop_unionFSM :: String -> String -> String -> Bool
 prop_unionFSM m n o =
