@@ -10,7 +10,7 @@ import System.Random
 
 -- Importing the keymap module
 
-import KeymapList
+import KeymapTree
 
 
 -- Type declarations
@@ -38,28 +38,35 @@ testDB = fromList [
 -- Exercise 1
 
 longestProductLen :: [(Barcode, Item)] -> Int
-longestProductLen = undefined
+longestProductLen xs = maximum [length b | (a,(b,i)) <- xs] 
 
 formatLine :: Int -> (Barcode, Item) -> String
-formatLine = undefined
+formatLine num (barcode, (product, unit)) = barcode ++ "..." ++ (fixed num product) ++ "..." ++ unit where
+  fixed :: Int -> String -> String
+  fixed num str | length str < num   = fixed num (str ++ ".") 
+                | otherwise          = str
 
 showCatalogue :: Catalogue -> String
-showCatalogue = undefined
+showCatalogue cs = concat [formatLine 100 c ++ "\n" | c <- toList cs]
      
 -- Exercise 2
+-- a) The return type is Maybe Item. Return values are all Just Item and Nothing
+
 maybeToList :: Maybe a -> [a]
-maybeToList = undefined
+maybeToList (Nothing) = []
+maybeToList (Just x)  = [x]
 
 listToMaybe :: [a] -> Maybe a
-listToMaybe = undefined
+listToMaybe [] = Nothing
+listToMaybe xs = Just (head xs)
 
 catMaybes :: [Maybe a] -> [a]
-catMaybes = undefined
+catMaybes xs = [x | Just x <- xs]
 
 -- Exercise 3
 
 getItems :: [Barcode] -> Catalogue -> [Item]
-getItems = undefined
+getItems codes cat = catMaybes [get code cat | code <- codes]
 
 
 -- Exercise 4
