@@ -119,9 +119,6 @@ prop_id :: Bool
 prop_id = and (map (\m -> (rows . rows) m == m && (cols . cols) m == m && (boxs . boxs) m == m) [easy,medium,hard,evil])
 
 -- 18.
-the :: [Digit] -> Digit
-the [d]  =  d
-
 pruneRow :: Row [Digit] -> Row [Digit]
 pruneRow row = pruneRow' 0 row where
     the [x] = x
