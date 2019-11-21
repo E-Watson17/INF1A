@@ -147,10 +147,15 @@ next m ss = canonical (ss ++ [ ddelta m s symbol | s <- ss, symbol <- alph m ])
 
 -- 7.
 reachable :: (Ord q) => FSM q -> [[q]] -> [[q]]
-reachable m ss | ss == ss' = ss
-               | otherwise = reachable m ss'
-               where
-                ss' = next m ss
+-- reachable m ss | ss == ss' = ss
+--                | otherwise = reachable m ss'
+--                where
+--                 ss' = next m ss
+
+reachable m = many (next m) where
+  many :: Eq a => (a -> a) -> a -> a
+  many g x | x == g x  = x
+           | otherwise = many g (g x)
 
 -- 8.
 dfinal :: (Ord q) => FSM q -> [[q]] -> [[q]]
