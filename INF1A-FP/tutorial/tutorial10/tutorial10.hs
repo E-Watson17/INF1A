@@ -126,10 +126,10 @@ pruneRow :: Row [Digit] -> Row [Digit]
 pruneRow row = pruneRow' 0 row where
     the [x] = x
     len = length row
-    rowFilter :: Digit -> Row [Digit] -> Row [Digit]
-    rowFilter c row = map (filter (/=c)) row
+    del :: Digit -> Row [Digit] -> Row [Digit]
+    del c row = map (filter (/=c)) row
     pruneRow' :: Int -> Row [Digit] -> Row [Digit]
-    pruneRow' i row | i < len && length (row!!i) == 1 = pruneRow' (i+1) (rowFilter (the(row!!i)) (take i row) ++ [row!!i] ++ rowFilter (the(row!!i)) (drop (i+1) row))
+    pruneRow' i row | i < len && length (row!!i) == 1 = pruneRow' (i+1) (del (the(row!!i)) (take i row) ++ [row!!i] ++ del (the(row!!i)) (drop (i+1) row))
                     | i < len                         = pruneRow' (i+1) row
                     | otherwise = row
 
