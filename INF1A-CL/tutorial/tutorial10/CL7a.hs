@@ -143,6 +143,10 @@ envs :: [a] -> [Env a]
 envs []      =  [[]]
 envs (x:xs)  =  [ (x,False):e | e <- envs xs ] ++ [ (x,True ):e | e <- envs xs ]
 
+-- Count the number of valuation given A B C D W X Y Z 
+countModels :: Wff Atom -> Int
+countModels wff = length (filter (\e -> eval e wff) (envs [A, B, C, D, W, X, Y, Z]))
+
 -- Checks whether a wff is satisfiable
 satisfiable :: Ord a => Wff a -> Bool
 satisfiable p  =  or [ eval e p | e <- envs (atoms p) ]
