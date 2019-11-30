@@ -134,6 +134,8 @@ prop_reverseFSM s = acceptsFSM (reverseFSM $ stringFSM s) (reverse s)
 tidyFSM :: Ord q => FSM q -> FSM q
 tidyFSM =  reverseFSM . pruneFSM . reverseFSM . pruneFSM
 
+exampleFSM = mkFSM [0,1,2,3] "ab" [(0,'a',1),(0,'b',3),(1,'a',2),(1,'b',3),(2,'a',0),(2,'b',3),(3,'a',1)] [0] [3]
+
 -- -- NFA adding epsilon-transitions
 data NFA q = NFA (Set q) (Set Sym) [Trans q] [(q,q)] (Set q)(Set q) deriving Show
 mkNFA qs as ts es ss fs = NFA qs' as' ts' es' ss' fs' where
